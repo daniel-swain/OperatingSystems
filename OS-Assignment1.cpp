@@ -70,31 +70,50 @@ void* sifter(void* args)
 	string input = "";
 	pthread_t rep, hil1, hil2;
 
-	std::cout << "Enter codes, when done enter 'end' \n";
+	std::cout << "Enter codes, when done enter 'end': \n";
 
-	while (input.compare(END) || errCounter <= 3)	/* Until the user enters 'end' */
+	while (errCounter < 3)	/* Until the user enters 'end' */
 	{
 		getline (cin, input);
 		string code = input;
 
-		for (unsigned int i = 0; i < code.length(); i++)	/*	Look for the asterisks add to vector. */
+		if (code.front() == 'e' && code.at(code.size()-1) == 'd' && code.size() == 3) {
+			cout << "Goodbye." << endl;
+			break;
+		}
+
+		for (unsigned int i = 0; i < code.length(); i++) /* Look for the asterisks add to vector. */
 		{
 			if (code.at(i) == ASTERISK)
 			{
-				buffer.push_back(code.substr(0, i));		/*	Add the code */
-				code = code.substr(i + 2, code.length());	/*	Clear the code from the string.
-																Skip the asterisk and the space.	*/
+				buffer.push_back(code.substr(0, i)); /* Add the code */
+				code = code.substr(i + 2, code.length()); /* Clear the code from the string. 
+															Skip the asterisk and the space. */
 			}
 		}
 
-		buffer.push_back(code);								/*	Add everything else. */
+		buffer.push_back(code);	 /*	Add everything else. */
 
 		while (!buffer.empty()) 
 		{
-			string message = buffer.front();	/* First message in the buffer. */
-			char algID = message.at(0);			/* Decides which algorithm to do. */
+			string message = buffer.front(); /* First message in the buffer. */
+			char algID = message.at(0);	 /* Decides which algorithm to do. */
 
-			if (algID >= '1' && algID <= '3')	/* Validate form */
+			for (int i = 1; i < message.length(); i++) 
+			{
+				if (algID == ' ') /* If it grabbed a space, continue till it finds a number. */
+				{ 
+					algID = message.at(i);
+				}
+			}
+
+			if (!isdigit(algID))
+			{
+				cout << "Error found in code: " << message << endl;
+				cout << "Number of errors left:  " << 3 - (++errCounter) << endl;
+			}
+
+			if (algID >= '1' && algID <= '3') /* Validate form */
 			{
 				if (algID == '1')	/* Do Replacement */
 				{
@@ -123,8 +142,8 @@ void* sifter(void* args)
 			}
 			else /* Error, increase error counter. */
 			{
-				cout << "Error found in code: "		<<		message		<< endl;
-				cout << "Number of errors left:  "	<<	3-(++errCounter)<< endl;
+				cout << "Error found in code: "		<< message << endl;
+				cout << "Number of errors left:  "	<< 3-(++errCounter) << endl;
 			}
 
 			buffer.erase(buffer.begin()); /* Remove the head. */
@@ -141,6 +160,14 @@ void* replacement(void* args)
 	string message = *reinterpret_cast<std::string*>(args), decodedMessage = "";
 	char decipherChar = message.at(1), originalChar, newChar;
 
+	if (isdigit(decipherChar)) /* Check if the decipher char is a digit. */
+	{ 
+		cout << "Error: decipher character is a digit. " << endl;
+		cout << "Number of errors left:  " << 3 - (++errCounter) << endl;
+		pthread_exit(0);
+		return (NULL);
+	}
+
 	int shift = alphaToNumMap[decipherChar];
 	shift = (shift % 10) + 2;
 
@@ -149,12 +176,13 @@ void* replacement(void* args)
 
 		if (isdigit(originalChar)) {
 			cout << "Error: digit found in replacement identified code." << endl;
-			errCounter++;
-			break;
+			cout << "Number of errors left:  " << 3 - (++errCounter) << endl;
+			pthread_exit(0);
+			return (NULL);
 		}
 
 		if (originalChar != ' ') {
-			int check = alphaToNumMap[originalChar] - shift;	
+			int check = alphaToNumMap[toupper(originalChar)] - shift;	
 
 			if (check < 0) {					/* Check for word wrap. */
 				check = 26 + check;
@@ -179,7 +207,7 @@ void* hillCase1(void* args)
 		section_1, section_2, decodedMessage = "";
 
 	int indexToSplit = 0;
-	for (unsigned int i = 0; i < message.length(); i++) {
+	for (unsigned int i = 1; i < message.length(); i++) {
 		if (isdigit(message[i])) {
 			indexToSplit = i - 1;
 			break;
@@ -194,7 +222,16 @@ void* hillCase1(void* args)
 	stringstream sstream(section_2);
 	int a, b, c, d;
 	a = b = c = d = 0;
-	sstream >> a >> b >> c >> d;
+	int error = INFINITE; /* Error Integer to check if there are too many numbers. */
+	sstream >> a >> b >> c >> d >> error;
+
+	if (error != INFINITE) 
+	{
+		cout << "Error: Too many digits found in Hill Case 1 Algorithm." << endl;
+		cout << "Number of errors left:  " << 3 - (++errCounter) << endl;
+		pthread_exit(0);
+		return (NULL);
+	}
 
 	// Turn the sections into arrays
 	char first, second;
@@ -203,8 +240,8 @@ void* hillCase1(void* args)
 		second = section_1[i + 1];
 
 		if (isalpha(first) && isalpha(second)) {
-			int x = alphaToNumMap[first];	// Get the numeric value
-			int y = alphaToNumMap[second];
+			int x = alphaToNumMap[toupper(first)];	// Get the numeric value
+			int y = alphaToNumMap[toupper(second)];
 			decodedMessage += numToAlphaMap[((a * x) + (b * y)) % 26]; // matrix multiplication then find alpha value
 			decodedMessage += numToAlphaMap[((c * x) + (d * y)) % 26];
 
@@ -216,7 +253,7 @@ void* hillCase1(void* args)
 		}
 	}
 
-	cout << "Hill case 1:" << decodedMessage << endl;
+	cout << "Hill Case 1 Algorithm: " << decodedMessage << endl;
 
 	pthread_exit(0);
 	return (NULL);
@@ -230,7 +267,7 @@ void* hillCase2(void* args)
 	string origMessage = *reinterpret_cast<std::string*>(args);
 
 	int indexToSplit = 0;
-	for (unsigned int i = 0; i < origMessage.length(); i++) {
+	for (unsigned int i = 1; i < origMessage.length(); i++) {
 		if (isdigit(origMessage[i])) {
 			indexToSplit = i - 1;
 			break;
@@ -245,7 +282,16 @@ void* hillCase2(void* args)
 	stringstream sstream(section_2);
 	int a, b, c, d, e, f, g, h, i;
 	a = b = c = d = e = f = g = h = i = 0;
-	sstream >> a >> b >> c >> d >> e >> f >> g >> h >> i;
+	int error = INFINITE; /* Error Integer to check if there are too many numbers. */
+	sstream >> a >> b >> c >> d >> e >> f >> g >> h >> i >> error;
+
+	if (error != INFINITE)
+	{
+		cout << "Error: Too many digits found in Hill Case 1 Algorithm." << endl;
+		cout << "Number of errors left:  " << 3 - (++errCounter) << endl;
+		pthread_exit(0);
+		return (NULL);
+	}
 
 	// Turn the sections into arrays
 	char first, second, third;
@@ -255,9 +301,9 @@ void* hillCase2(void* args)
 		third = section_1[i + 2];
 
 		if (isalpha(first) && isalpha(second) && isalpha(third)) {
-			int x = alphaToNumMap[first];	// Get the numeric value
-			int y = alphaToNumMap[second];
-			int z = alphaToNumMap[third];
+			int x = alphaToNumMap[toupper(first)];	// Get the numeric value
+			int y = alphaToNumMap[toupper(second)];
+			int z = alphaToNumMap[toupper(third)];
 			decodedMessage += numToAlphaMap[((a * x) + (b * y) + (c * z)) % 26]; // matrix multiplication then find alpha value
 			decodedMessage += numToAlphaMap[((d * x) + (e * y) + (f * z)) % 26];
 			decodedMessage += numToAlphaMap[((g * x) + (h * y) + (i * z)) % 26];
@@ -269,7 +315,7 @@ void* hillCase2(void* args)
 			i++; // Skip over one
 		}
 	}
-	cout << "Hill case 2:" << decodedMessage << endl;
+	cout << "Hill Case 2 Algorithm: " << decodedMessage << endl;
 	pthread_exit(0);
 	return (NULL);
 }
