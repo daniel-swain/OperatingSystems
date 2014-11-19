@@ -86,10 +86,9 @@ void* sifter(void* args)
 		{
 			if (code.at(i) == ASTERISK)
 			{
-				buffer.push_back(code.substr(0, i)); /* Add the code */
-				code = code.substr(i + 2, code.length()); /* Clear the code from the string. 
-															Skip the asterisk and the space. */
-			}
+				buffer.push_back(code.substr(0, i)); /* Add the code */ 
+				// Clear the code from the string. Skip the asterisk and the space.
+				code = code.substr(i + 2, code.length());}
 		}
 
 		buffer.push_back(code);	 /*	Add everything else. */
@@ -182,14 +181,14 @@ void* replacement(void* args)
 		}
 
 		if (originalChar != ' ') {
-			int check = alphaToNumMap[toupper(originalChar)] - shift;	
+			int check = alphaToNumMap[originalChar] - shift;	
 
-			if (check < 0) {					/* Check for word wrap. */
+			if (check < 0) { /* Check for word wrap. */
 				check = 26 + check;
 			}
 
-			newChar = numToAlphaMap[check];		/* Get new character. */
-			decodedMessage += newChar;			/* Add to decoded string. */
+			newChar = numToAlphaMap[check]; /* Get new character. */
+			decodedMessage += newChar; /* Add to decoded string. */
 		}
 		else {
 			decodedMessage += ' ';
@@ -240,9 +239,10 @@ void* hillCase1(void* args)
 		second = section_1[i + 1];
 
 		if (isalpha(first) && isalpha(second)) {
-			int x = alphaToNumMap[toupper(first)];	// Get the numeric value
-			int y = alphaToNumMap[toupper(second)];
-			decodedMessage += numToAlphaMap[((a * x) + (b * y)) % 26]; // matrix multiplication then find alpha value
+			int x = alphaToNumMap[first];	// Get the numeric value
+			int y = alphaToNumMap[second];
+			// matrix multiplication then find alpha value
+			decodedMessage += numToAlphaMap[((a * x) + (b * y)) % 26];
 			decodedMessage += numToAlphaMap[((c * x) + (d * y)) % 26];
 
 			i += 2;	// Go to next pair of characters
@@ -301,10 +301,10 @@ void* hillCase2(void* args)
 		third = section_1[i + 2];
 
 		if (isalpha(first) && isalpha(second) && isalpha(third)) {
-			int x = alphaToNumMap[toupper(first)];	// Get the numeric value
-			int y = alphaToNumMap[toupper(second)];
-			int z = alphaToNumMap[toupper(third)];
-			decodedMessage += numToAlphaMap[((a * x) + (b * y) + (c * z)) % 26]; // matrix multiplication then find alpha value
+			int x = alphaToNumMap[first];	// Get the numeric value
+			int y = alphaToNumMap[second];
+			int z = alphaToNumMap[third];
+			decodedMessage += numToAlphaMap[((a * x) + (b * y) + (c * z)) % 26]; 
 			decodedMessage += numToAlphaMap[((d * x) + (e * y) + (f * z)) % 26];
 			decodedMessage += numToAlphaMap[((g * x) + (h * y) + (i * z)) % 26];
 
