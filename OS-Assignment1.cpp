@@ -17,12 +17,14 @@
 #include <string>
 #include <sstream>
 #include <map>
-#include <Windows.h>
+#include <limits>
+
+using namespace std;
 
 #define END "end"
 #define ASTERISK '*'
+#define MAX 214748364
 
-using namespace std;
 
 void* sifter(void*);
 void* replacement(void*);
@@ -236,13 +238,20 @@ void* hillCase1(void* args)
 	// Trim white space
 	stringstream sstream(section_2);
 	int a, b, c, d;
-	a = b = c = d = 0;
-	int error = INFINITE; /* Error Integer to check if there are too many numbers. */
+	a = b = c = d = MAX; /* Check if all the integers are filled. */
+	int error = MAX; /* Error Integer to check if there are too many numbers. */
 	sstream >> a >> b >> c >> d >> error;
 
-	if (error != INFINITE) 
+	if (error != MAX) 
 	{
 		cout << "Error: Too many digits found in Hill Case 1 Algorithm." << endl;
+		cout << "Number of errors left:  " << 3 - (++errCounter) << endl;
+		pthread_exit(0);
+		return (NULL);
+	}
+	if (a == MAX || b == MAX || c == MAX || d == MAX)
+	{
+		cout << "Error: Not enough digits found in Hill Case 1 Algorithm." << endl;
 		cout << "Number of errors left:  " << 3 - (++errCounter) << endl;
 		pthread_exit(0);
 		return (NULL);
@@ -297,13 +306,20 @@ void* hillCase2(void* args)
 	// Trim white space
 	stringstream sstream(section_2);
 	int a, b, c, d, e, f, g, h, i;
-	a = b = c = d = e = f = g = h = i = 0;
-	int error = INFINITE; /* Error Integer to check if there are too many numbers. */
+	a = b = c = d = e = f = g = h = i = MAX;
+	int error = MAX; /* Error Integer to check if there are too many numbers. */
 	sstream >> a >> b >> c >> d >> e >> f >> g >> h >> i >> error;
 
-	if (error != INFINITE)
+	if (error != MAX )
 	{
-		cout << "Error: Too many digits found in Hill Case 1 Algorithm." << endl;
+		cout << "Error: Too many digits found in Hill Case 2 Algorithm." << endl;
+		cout << "Number of errors left:  " << 3 - (++errCounter) << endl;
+		pthread_exit(0);
+		return (NULL);
+	}
+	if (a == MAX || b == MAX || c == MAX || d == MAX || e == MAX || f == MAX || g == MAX || h == MAX || i == MAX)
+	{
+		cout << "Error: Not enough digits found in Hill Case 2 Algorithm." << endl;
 		cout << "Number of errors left:  " << 3 - (++errCounter) << endl;
 		pthread_exit(0);
 		return (NULL);
