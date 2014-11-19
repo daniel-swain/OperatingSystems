@@ -87,8 +87,9 @@ void* sifter(void* args)
 			if (code.at(i) == ASTERISK)
 			{
 				buffer.push_back(code.substr(0, i)); /* Add the code */ 
-				// Clear the code from the string. Skip the asterisk and the space.
-				code = code.substr(i + 2, code.length());}
+				// Clear the code from the string. Skip the asterisk.
+				code = code.substr(i + 1, code.length());
+			}
 		}
 
 		buffer.push_back(code);	 /*	Add everything else. */
@@ -97,12 +98,14 @@ void* sifter(void* args)
 		{
 			string message = buffer.front(); /* First message in the buffer. */
 			char algID = message.at(0);	 /* Decides which algorithm to do. */
-
-			for (int i = 1; i < message.length(); i++) 
+			
+			for (unsigned int i = 1; i < message.length(); i++) 
 			{
-				if (algID == ' ') /* If it grabbed a space, continue till it finds a number. */
+				if (algID == ' ' && isdigit(message.at(i))) /* If it grabbed a space, continue till it finds a number. */
 				{ 
 					algID = message.at(i);
+					message = message.substr(i, message.length()); //algID[0], message[1 -> message.length()-1]
+					break;
 				}
 			}
 
@@ -167,7 +170,20 @@ void* replacement(void* args)
 		return (NULL);
 	}
 
-	int shift = alphaToNumMap[decipherChar];
+	if (decipherChar == ' ') 
+	{
+		for (unsigned int i = 2; i < message.length(); i++)
+		{
+			if (isalpha(message.at(i))) 
+			{
+				decipherChar = message.at(i);
+				message = message.substr(i - 1, message.length());
+				break;
+			}
+		}
+	}
+
+	int shift = alphaToNumMap[toupper(decipherChar)];
 	shift = (shift % 10) + 2;
 
 	for (unsigned int i = 2; i < message.size(); i++) {	
@@ -181,7 +197,7 @@ void* replacement(void* args)
 		}
 
 		if (originalChar != ' ') {
-			int check = alphaToNumMap[originalChar] - shift;	
+			int check = alphaToNumMap[toupper(originalChar)] - shift;	
 
 			if (check < 0) { /* Check for word wrap. */
 				check = 26 + check;
@@ -239,8 +255,8 @@ void* hillCase1(void* args)
 		second = section_1[i + 1];
 
 		if (isalpha(first) && isalpha(second)) {
-			int x = alphaToNumMap[first];	// Get the numeric value
-			int y = alphaToNumMap[second];
+			int x = alphaToNumMap[toupper(first)];	// Get the numeric value
+			int y = alphaToNumMap[toupper(second)];
 			// matrix multiplication then find alpha value
 			decodedMessage += numToAlphaMap[((a * x) + (b * y)) % 26];
 			decodedMessage += numToAlphaMap[((c * x) + (d * y)) % 26];
@@ -301,9 +317,9 @@ void* hillCase2(void* args)
 		third = section_1[i + 2];
 
 		if (isalpha(first) && isalpha(second) && isalpha(third)) {
-			int x = alphaToNumMap[first];	// Get the numeric value
-			int y = alphaToNumMap[second];
-			int z = alphaToNumMap[third];
+			int x = alphaToNumMap[toupper(first)];	// Get the numeric value
+			int y = alphaToNumMap[toupper(second)];
+			int z = alphaToNumMap[toupper(third)];
 			decodedMessage += numToAlphaMap[((a * x) + (b * y) + (c * z)) % 26]; 
 			decodedMessage += numToAlphaMap[((d * x) + (e * y) + (f * z)) % 26];
 			decodedMessage += numToAlphaMap[((g * x) + (h * y) + (i * z)) % 26];
