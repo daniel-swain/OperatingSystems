@@ -68,7 +68,7 @@ int main()
 /*==========================================================================*/
 void* sifter(void* args) 
 {
-	vector<string> buffer;			/* Hold the message(s). */
+	vector<string> buffer; /* Hold the message(s). */
 	string input = "";
 	pthread_t rep, hil1, hil2;
 
@@ -77,8 +77,8 @@ void* sifter(void* args)
 	while (errCounter < 3)	/* Until the user enters 'end' */
 	{
 		getline (cin, input);
-		string code = input;
-
+		string code = "" + input;
+		
 		if (code.front() == 'e' && code.at(code.size()-1) == 'd' && code.size() == 3) {
 			cout << "Goodbye." << endl;
 			break;
@@ -91,6 +91,7 @@ void* sifter(void* args)
 				buffer.push_back(code.substr(0, i)); /* Add the code */ 
 				// Clear the code from the string. Skip the asterisk.
 				code = code.substr(i + 1, code.length());
+				i = 0; // Reset
 			}
 		}
 
@@ -103,7 +104,7 @@ void* sifter(void* args)
 			
 			for (unsigned int i = 1; i < message.length(); i++) 
 			{
-				if (algID == ' ' && isdigit(message.at(i))) /* If it grabbed a space, continue till it finds a number. */
+				if (algID == ' ' && isdigit(message.at(i))) // If it grabbed a space, continue till a number. 
 				{ 
 					algID = message.at(i);
 					message = message.substr(i, message.length()); //algID[0], message[1 -> message.length()-1]
@@ -113,10 +114,10 @@ void* sifter(void* args)
 
 			if (!isdigit(algID))
 			{
-				cout << "Error found in code: " << message << endl;
+				cout << endl << "No Algorithm ID found in code: " << message << endl;
 				cout << "Number of errors left:  " << 3 - (++errCounter) << endl;
 			}
-
+			else
 			if (algID >= '1' && algID <= '3') /* Validate form */
 			{
 				if (algID == '1')	/* Do Replacement */
@@ -146,8 +147,8 @@ void* sifter(void* args)
 			}
 			else /* Error, increase error counter. */
 			{
-				cout << "Error found in code: "		<< message << endl;
-				cout << "Number of errors left:  "	<< 3-(++errCounter) << endl;
+				cout << endl << "Algorithm ID number does not exist for code: " << message << endl;
+				cout << "Number of errors left:  " << 3-(++errCounter) << endl;
 			}
 
 			buffer.erase(buffer.begin()); /* Remove the head. */
@@ -166,7 +167,7 @@ void* replacement(void* args)
 
 	if (isdigit(decipherChar)) /* Check if the decipher char is a digit. */
 	{ 
-		cout << "Error: decipher character is a digit. " << endl;
+		cout << endl << "Error: decipher character is a digit. " << endl;
 		cout << "Number of errors left:  " << 3 - (++errCounter) << endl;
 		pthread_exit(0);
 		return (NULL);
@@ -192,7 +193,7 @@ void* replacement(void* args)
 		originalChar = message.at(i);
 
 		if (isdigit(originalChar)) {
-			cout << "Error: digit found in replacement identified code." << endl;
+			cout << endl << "Error: Digit found in replacement identified code." << endl;
 			cout << "Number of errors left:  " << 3 - (++errCounter) << endl;
 			pthread_exit(0);
 			return (NULL);
@@ -212,7 +213,7 @@ void* replacement(void* args)
 			decodedMessage += ' ';
 		}
 	}
-	cout << "Replcament Algorithm: " << decodedMessage << endl;
+	cout << endl << "Replcament Algorithm: " << decodedMessage << endl;
 	pthread_exit(0);
 	return (NULL);
 }
@@ -244,14 +245,14 @@ void* hillCase1(void* args)
 
 	if (error != MAX) 
 	{
-		cout << "Error: Too many digits found in Hill Case 1 Algorithm." << endl;
+		cout << endl << "Error: Too many digits found in Hill Case 1 Algorithm." << endl;
 		cout << "Number of errors left:  " << 3 - (++errCounter) << endl;
 		pthread_exit(0);
 		return (NULL);
 	}
 	if (a == MAX || b == MAX || c == MAX || d == MAX)
 	{
-		cout << "Error: Not enough digits found in Hill Case 1 Algorithm." << endl;
+		cout << endl << "Error: Not enough digits found in Hill Case 1 Algorithm." << endl;
 		cout << "Number of errors left:  " << 3 - (++errCounter) << endl;
 		pthread_exit(0);
 		return (NULL);
@@ -278,7 +279,7 @@ void* hillCase1(void* args)
 		}
 	}
 
-	cout << "Hill Case 1 Algorithm: " << decodedMessage << endl;
+	cout << endl << "Hill Case 1 Algorithm: " << decodedMessage << endl;
 
 	pthread_exit(0);
 	return (NULL);
@@ -312,14 +313,14 @@ void* hillCase2(void* args)
 
 	if (error != MAX )
 	{
-		cout << "Error: Too many digits found in Hill Case 2 Algorithm." << endl;
+		cout << endl << "Error: Too many digits found in Hill Case 2 Algorithm." << endl;
 		cout << "Number of errors left:  " << 3 - (++errCounter) << endl;
 		pthread_exit(0);
 		return (NULL);
 	}
 	if (a == MAX || b == MAX || c == MAX || d == MAX || e == MAX || f == MAX || g == MAX || h == MAX || i == MAX)
 	{
-		cout << "Error: Not enough digits found in Hill Case 2 Algorithm." << endl;
+		cout << endl << "Error: Not enough digits found in Hill Case 2 Algorithm." << endl;
 		cout << "Number of errors left:  " << 3 - (++errCounter) << endl;
 		pthread_exit(0);
 		return (NULL);
@@ -347,7 +348,7 @@ void* hillCase2(void* args)
 			i++; // Skip over one
 		}
 	}
-	cout << "Hill Case 2 Algorithm: " << decodedMessage << endl;
+	cout << endl << "Hill Case 2 Algorithm: " << decodedMessage << endl;
 	pthread_exit(0);
 	return (NULL);
 }
