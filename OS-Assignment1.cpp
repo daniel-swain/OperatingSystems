@@ -17,14 +17,13 @@
 #include <string>
 #include <sstream>
 #include <map>
-#include <limits>
+#include <Windows.h>
 
 using namespace std;
 
 #define END "end"
 #define ASTERISK '*'
 #define MAX 214748364
-
 
 void* sifter(void*);
 void* replacement(void*);
@@ -76,7 +75,7 @@ void* sifter(void* args)
 
 	while (errCounter < 3)	/* Until the user enters 'end' */
 	{
-		getline (cin, input);
+		getline (cin, input); // TODO: Currently will give an error if return is pressed with no input.
 		string code = "" + input;
 		
 		if (code.front() == 'e' && code.at(code.size()-1) == 'd' && code.size() == 3) {
@@ -167,7 +166,7 @@ void* replacement(void* args)
 
 	if (isdigit(decipherChar)) /* Check if the decipher char is a digit. */
 	{ 
-		cout << endl << "Error: decipher character is a digit. " << endl;
+		cout << endl << "Error: Decipher character is a digit in Replacement Algorithm code. " << endl;
 		cout << "Number of errors left:  " << 3 - (++errCounter) << endl;
 		pthread_exit(0);
 		return (NULL);
@@ -193,7 +192,7 @@ void* replacement(void* args)
 		originalChar = message.at(i);
 
 		if (isdigit(originalChar)) {
-			cout << endl << "Error: Digit found in replacement identified code." << endl;
+			cout << endl << "Error: Digit found in Replacement Algorithm code." << endl;
 			cout << "Number of errors left:  " << 3 - (++errCounter) << endl;
 			pthread_exit(0);
 			return (NULL);
@@ -214,6 +213,7 @@ void* replacement(void* args)
 		}
 	}
 	cout << endl << "Replcament Algorithm: " << decodedMessage << endl;
+	Sleep(100);
 	pthread_exit(0);
 	return (NULL);
 }
@@ -236,6 +236,17 @@ void* hillCase1(void* args)
 	section_1 = message.substr(1, indexToSplit);
 	section_2 = message.substr(indexToSplit, message.length() - 1);
 
+	// Check if matrix has characters
+	for (int i = 0; i < section_2.length(); i++) 
+	{
+		if (isalpha(section_2.at(i))) {
+			cout << endl << "Error: Characters found in Hill Case 1 Algorithm matrix." << endl;
+			cout << "Number of errors left:  " << 3 - (++errCounter) << endl;
+			pthread_exit(0);
+			return (NULL);
+		}
+	}
+
 	// Trim white space
 	stringstream sstream(section_2);
 	int a, b, c, d;
@@ -243,16 +254,18 @@ void* hillCase1(void* args)
 	int error = MAX; /* Error Integer to check if there are too many numbers. */
 	sstream >> a >> b >> c >> d >> error;
 
+	// Check if there are more than four integers
 	if (error != MAX) 
 	{
-		cout << endl << "Error: Too many digits found in Hill Case 1 Algorithm." << endl;
+		cout << endl << "Error: Too many integers found in Hill Case 1 Algorithm." << endl;
 		cout << "Number of errors left:  " << 3 - (++errCounter) << endl;
 		pthread_exit(0);
 		return (NULL);
 	}
+	// Check if each entry in the 2x2 matrix has values.
 	if (a == MAX || b == MAX || c == MAX || d == MAX)
 	{
-		cout << endl << "Error: Not enough digits found in Hill Case 1 Algorithm." << endl;
+		cout << endl << "Error: All entries of 2x2 matrix are not filled in Hill Case 1 Algorithm." << endl;
 		cout << "Number of errors left:  " << 3 - (++errCounter) << endl;
 		pthread_exit(0);
 		return (NULL);
@@ -280,7 +293,7 @@ void* hillCase1(void* args)
 	}
 
 	cout << endl << "Hill Case 1 Algorithm: " << decodedMessage << endl;
-
+	Sleep(100);
 	pthread_exit(0);
 	return (NULL);
 }
@@ -304,6 +317,17 @@ void* hillCase2(void* args)
 	section_1 = origMessage.substr(1, indexToSplit);
 	section_2 = origMessage.substr(indexToSplit, origMessage.length() - 1);
 
+	// Check if matrix has characters
+	for (int i = 0; i < section_2.length(); i++)
+	{
+		if (isalpha(section_2.at(i))) {
+			cout << endl << "Error: Characters found in Hill Case 1 Algorithm matrix." << endl;
+			cout << "Number of errors left:  " << 3 - (++errCounter) << endl;
+			pthread_exit(0);
+			return (NULL);
+		}
+	}
+
 	// Trim white space
 	stringstream sstream(section_2);
 	int a, b, c, d, e, f, g, h, i;
@@ -311,16 +335,18 @@ void* hillCase2(void* args)
 	int error = MAX; /* Error Integer to check if there are too many numbers. */
 	sstream >> a >> b >> c >> d >> e >> f >> g >> h >> i >> error;
 
+	// Check if there are too many integers entered.
 	if (error != MAX )
 	{
-		cout << endl << "Error: Too many digits found in Hill Case 2 Algorithm." << endl;
+		cout << endl << "Error: Too many integers found in Hill Case 2 Algorithm." << endl;
 		cout << "Number of errors left:  " << 3 - (++errCounter) << endl;
 		pthread_exit(0);
 		return (NULL);
 	}
+	// Check if all the entries in the 2x3 matrix are filled.
 	if (a == MAX || b == MAX || c == MAX || d == MAX || e == MAX || f == MAX || g == MAX || h == MAX || i == MAX)
 	{
-		cout << endl << "Error: Not enough digits found in Hill Case 2 Algorithm." << endl;
+		cout << endl << "Error: All entries of 2x3 matrix are not filled in Hill Case 2 Algorithm." << endl;
 		cout << "Number of errors left:  " << 3 - (++errCounter) << endl;
 		pthread_exit(0);
 		return (NULL);
@@ -349,6 +375,7 @@ void* hillCase2(void* args)
 		}
 	}
 	cout << endl << "Hill Case 2 Algorithm: " << decodedMessage << endl;
+	Sleep(100);
 	pthread_exit(0);
 	return (NULL);
 }
